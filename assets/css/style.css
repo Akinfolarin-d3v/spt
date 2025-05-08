@@ -506,12 +506,14 @@ body.active { overflow: hidden; }
 /* Adjust height for larger screens */
 @media (min-width: 1024px) {  
   .hero-content {  
-    height: 70vh; 
+    height: 70vh; /* Reduce height to balance spacing */
+  }
 }
 
 
 .hero-subtitle {
   color: var(--citrine);
+  /* backdrop-filter: blur(10px);  */
   font-size: var(--fs-4);
   font-weight: var(--fw-700);
   margin-bottom: 30px;
@@ -526,16 +528,16 @@ body.active { overflow: hidden; }
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 40vh;
-  width: 90vw;
-  margin: 0; 
+  height: 40vh; /* Default height for mobile */
+  width: 90vw; /* Full width of the viewport */
+  margin: 0; /* Remove any automatic centering */
   border-radius: 10px; 
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.8), 0 0 50px rgba(0, 0, 0, 0.6), 0 0 8px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 0, 0, 0.2);
   font-family: "Pacifico", cursive;
   font-weight: lighter;
   font-size: 19px;
   text-align: center;
-  position: relative;
+  position: relative; /* Ensures it stays relative to the viewport */
   left: 0;
   right: 0;
   
@@ -545,14 +547,14 @@ body.active { overflow: hidden; }
 /* Adjust height for larger screens */
 @media (min-width: 768px) { 
   .hero-title {
-    height: 60vh; 
+    height: 60vh; /* Increase height on tablets & small laptops */
     font-size: 24px;
   }
 }
 
 @media (min-width: 1024px) { 
   .hero-title {
-    height: 80vh; 
+    height: 80vh; /* Make it bigger on desktops */
     font-size: 28px;
   }
 }
@@ -1123,7 +1125,9 @@ body.active { overflow: hidden; }
  * #MEDIA QUERIES
 \*-----------------------------------*/
 
-
+/**
+ * responsive for large than 550px screen
+ */
 
 @media (min-width: 550px) {
 
@@ -1894,29 +1898,30 @@ body.active { overflow: hidden; }
    Audio Player Overrides in Cart & Modal
 ----------------------------------------- */
 
-
+/* Wrapper stays centered and sized to content */
 .audio-player {
-  display: inline-flex;     
-  flex: none !important;  
-  width: auto !important; 
+  display: inline-flex;      /* inline instead of block flex */
+  flex: none !important;     /* don’t grow or shrink */
+  width: auto !important;    /* no inherited width */
   margin-bottom: 1rem;
   align-items: center;
   gap: 0.5rem;
 }
 
 
-
+/* Hide the native audio element */
 .audio-player audio {
   display: none;
 }
 
 /* Very small play button */
 .audio-player .play-btn {
+  /* override any full-width */
   width: auto !important;
   flex: none !important;
-  padding: 4px 8px !important;     
-  font-size: 0.65rem !important;     
-  border-radius: 20px !important;    
+  padding: 4px 8px !important;       /* tiny padding */
+  font-size: 0.65rem !important;      /* small text */
+  border-radius: 20px !important;     /* small pill */
 }
 
 /* Even smaller icon */
@@ -1928,6 +1933,8 @@ body.active { overflow: hidden; }
   border-radius: 20px !important;
 }
 
+
+/* Ensure demo-list centers its players without stretching */
 .cart-item .demo-list {
   width: auto !important;
   display: flex;
@@ -1935,15 +1942,16 @@ body.active { overflow: hidden; }
   align-items: flex-start;
 }
 
+/* Target only play buttons inside audio-player containers */
 .audio-player .btn.btn-primary.play-btn {
-  padding: 8px 12px;     
-  font-size: 0.85rem;     
-  min-width: 40px;        
-  height: auto;          
-  line-height: 1;    
+  padding: 8px 12px;       /* increase padding for a bit more click area */
+  font-size: 0.85rem;      /* slightly larger text/icon */
+  min-width: 40px;         /* ensure a minimal width */
+  height: auto;            /* allow height to adjust */
+  line-height: 1;          /* tighten line-height */
 }
 
+/* Optionally adjust the ion-icon inside play buttons */
 .audio-player .btn.btn-primary.play-btn ion-icon {
-  font-size: 1.2rem;     
-}
+  font-size: 1.2rem;       /* slightly larger icon */
 }
