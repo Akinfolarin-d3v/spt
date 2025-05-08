@@ -1,59 +1,34 @@
 'use strict';
 
 /**
- * navbar variables
+ * NAVBAR & STICKY HEADER & GO TOP
  */
-
-const navOpenBtn = document.querySelector("[data-menu-open-btn]");
+const navOpenBtn  = document.querySelector("[data-menu-open-btn]");
 const navCloseBtn = document.querySelector("[data-menu-close-btn]");
-const navbar = document.querySelector("[data-navbar]");
-const overlay = document.querySelector("[data-overlay]");
+const navbar      = document.querySelector("[data-navbar]");
+const overlay     = document.querySelector("[data-overlay]");
+const goTopBtn    = document.querySelector("[data-go-top]");
+const header      = document.querySelector("[data-header]");
 
-const navElemArr = [navOpenBtn, navCloseBtn, overlay];
-
-for (let i = 0; i < navElemArr.length; i++) {
-
-  navElemArr[i].addEventListener("click", function () {
-
+[navOpenBtn, navCloseBtn, overlay].forEach(el => {
+  el.addEventListener("click", () => {
     navbar.classList.toggle("active");
     overlay.classList.toggle("active");
     document.body.classList.toggle("active");
-
   });
-
-}
-
-
-
-/**
- * header sticky
- */
-
-const header = document.querySelector("[data-header]");
-
-window.addEventListener("scroll", function () {
-
-  window.scrollY >= 10 ? header.classList.add("active") : header.classList.remove("active");
-
 });
 
-
+window.addEventListener("scroll", () => {
+  header.classList.toggle("active", window.scrollY >= 10);
+  goTopBtn.classList.toggle("active", window.scrollY >= 500);
+});
 
 /**
- * go top
+ * INDEXEDDB HELPERS
  */
-
-const goTopBtn = document.querySelector("[data-go-top]");
-
-window.addEventListener("scroll", function () {
-
-  window.scrollY >= 500 ? goTopBtn.classList.add("active") : goTopBtn.classList.remove("active");
-
-});
-// ─── INDEXEDDB HELPERS ─────────────────────────────────────────────────────────
 function openDB() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('BeatStoreDB', 2);
+    const rq = indexedDB.open('BeatStoreDB', 3);
     rq.onupgradeneeded = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('products'))
@@ -69,9 +44,7 @@ function openDB() {
 async function getProducts() {
   const db = await openDB();
   return new Promise((res, rej) => {
-    const tx = db.transaction('products', 'readonly');
-    const os = tx.objectStore('products');
-    const rq = os.getAll();
+    const rq = db.transaction('products','readonly').objectStore('products').getAll();
     rq.onsuccess = () => res(rq.result);
     rq.onerror   = () => rej(rq.error);
   });
@@ -80,9 +53,7 @@ async function getProducts() {
 async function getCart() {
   const db = await openDB();
   return new Promise((res, rej) => {
-    const tx = db.transaction('cart', 'readonly');
-    const os = tx.objectStore('cart');
-    const rq = os.getAll();
+    const rq = db.transaction('cart','readonly').objectStore('cart').getAll();
     rq.onsuccess = () => res(rq.result);
     rq.onerror   = () => rej(rq.error);
   });
@@ -91,9 +62,7 @@ async function getCart() {
 async function saveCartItem(item) {
   const db = await openDB();
   return new Promise((res, rej) => {
-    const tx = db.transaction('cart', 'readwrite');
-    const os = tx.objectStore('cart');
-    const rq = os.add(item);
+    const rq = db.transaction('cart','readwrite').objectStore('cart').add(item);
     rq.onsuccess = () => res();
     rq.onerror   = () => rej(rq.error);
   });
@@ -102,25 +71,22 @@ async function saveCartItem(item) {
 async function deleteCartItem(id) {
   const db = await openDB();
   return new Promise((res, rej) => {
-    const tx = db.transaction('cart', 'readwrite');
-    const os = tx.objectStore('cart');
-    const rq = os.delete(id);
+    const rq = db.transaction('cart','readwrite').objectStore('cart').delete(id);
     rq.onsuccess = () => res();
     rq.onerror   = () => rej(rq.error);
   });
 }
 
-// ─── RENDER HOME PAGE PRODUCTS ─────────────────────────────────────────────────
+/**
+ * HOME PAGE: render into Upcoming / Top Rated / TV Series
+ */
 async function renderProducts() {
   const prods = await getProducts();
-
-  // Clear each section
-  ['upcoming', 'top-rated', 'tv-series'].forEach(sec => {
+  ['upcoming','top-rated','best-beat'].forEach(sec => {
     const ul = document.querySelector(`#${sec} .movies-list`);
     if (ul) ul.innerHTML = '';
   });
 
-  // Render into appropriate section
   prods.forEach(p => {
     const li = document.createElement('li');
     li.innerHTML = `
@@ -139,64 +105,64 @@ async function renderProducts() {
           </div>
         </div>
       </div>`;
-    const target = document.querySelector(`#${p.section} .movies-list`);
-    if (target) target.append(li);
+    document.querySelector(`#${p.section} .movies-list`)?.append(li);
   });
 
-  // Attach click handlers for product modal
+  // attach modal openers
   document.querySelectorAll('.movie-card').forEach(card => {
     card.addEventListener('click', async () => {
-      const id   = Number(card.dataset.id);
+      const id   = +card.dataset.id;
       const all  = await getProducts();
-      const p    = all.find(x => x.id === id);
-      openProductModal(p);
+      const prod = all.find(x => x.id === id);
+      openProductModal(prod);
     });
   });
 }
 
-// ─── PRODUCT MODAL LOGIC ────────────────────────────────────────────────────────
+/**
+ * PRODUCT PREVIEW MODAL
+ */
 function openProductModal(p) {
-  // Populate fields
   document.getElementById('modal-product-image').src         = p.image;
   document.getElementById('modal-product-title').textContent = p.title;
   document.getElementById('modal-product-badge').textContent = p.badge;
   document.getElementById('modal-product-price').textContent = p.price.toFixed(2);
 
-  // Audio demos
   const list = document.getElementById('modal-audio-list');
-  list.innerHTML = '';
-  p.demos.forEach(d => {
-    const w = document.createElement('div');
-    w.className = 'modal-audio-wrapper';
-    w.innerHTML = `<p>${d.name}</p><audio controls src="${d.url}"></audio>`;
-    list.append(w);
-  });
+  list.innerHTML = p.demos.map(d => `
+    <div class="modal-audio-wrapper">
+      <p>${d.name}</p>
+      <audio controls src="${d.url}"></audio>
+    </div>
+  `).join('');
 
-  // Add to cart
   document.getElementById('modal-add-to-cart').onclick = async () => {
     await saveCartItem({
-      title:  p.title,
-      price:  p.price,
-      demos:  p.demos.map(d => ({ name: d.name, url: d.url })),
-      zip:    p.zip
+      title: p.title,
+      price: p.price,
+      demos: p.demos.map(d=>d.url),
+      zip:   p.zip
     });
-    
     alert(`${p.title} added to cart!`);
     document.getElementById('product-modal').classList.add('hidden');
   };
 
-  // Show modal
   document.getElementById('product-modal').classList.remove('hidden');
 }
 
-// Close product modal
-document.getElementById('close-product-modal').onclick = () => {
-  document.getElementById('product-modal').classList.add('hidden');
-};
-
-// ─── CART MODAL LOGIC ───────────────────────────────────────────────────────────
-document.getElementById('cart-modal-btn').onclick = async () => {
-  const cart    = await getCart();
+const closeBtn = document.getElementById('close-product-modal');
+if (closeBtn) {
+  closeBtn.onclick = () => {
+    document.getElementById('close-product-modal').onclick = () => {
+      document.getElementById('product-modal').classList.add('hidden');
+    };
+  };
+}
+/**
+ * CART MODAL
+ */
+async function renderCart() {
+  const cart = await getCart();
   const ct      = document.getElementById('cart-items');
   const cc      = document.getElementById('cart-count');
   const totalEl = document.getElementById('cart-total');
@@ -208,105 +174,66 @@ document.getElementById('cart-modal-btn').onclick = async () => {
     totalEl.textContent = '0.00';
     dlBtn.disabled      = true;
   } else {
-    // 1) Build HTML with custom audio-player wrappers
     ct.innerHTML = cart.map(it => `
       <div class="cart-item" data-id="${it.id}">
         <h4>
           <span class="item-title">${it.title}</span>
-          
           <button class="remove-item-btn"><ion-icon name="trash-outline"></ion-icon></button>
         </h4>
         <div class="demo-list">
           ${it.demos.map(d => `
             <div class="audio-player">
               <button class="btn btn-primary play-btn">
-              <ion-icon name="play-circle-outline"></ion-icon>
-                
+                <ion-icon name="play-circle-outline"></ion-icon>
                 <span class="file-price">$${it.price.toFixed(2)}</span>
               </button>
-              <audio src="${d.url}"></audio>
+              <audio src="${d}"></audio>
             </div>
           `).join('')}
         </div>
       </div>
     `).join('');
 
-        
-    ct.querySelectorAll('.remove-item-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = Number(btn.closest('.cart-item').dataset.id);
+    // remove handlers
+    ct.querySelectorAll('.remove-item-btn').forEach(btn =>
+      btn.addEventListener('click', async e => {
+        const id = +e.currentTarget.closest('.cart-item').dataset.id;
         await deleteCartItem(id);
-        // re‑open/refresh the cart
-        document.getElementById('cart-modal-btn').click();
+        renderCart();
+      })
+    );
+
+    // play/pause handlers
+    ct.querySelectorAll('.audio-player').forEach(player => {
+      const btn   = player.querySelector('.play-btn');
+      const audio = player.querySelector('audio');
+      btn.addEventListener('click', () => {
+        if (audio.paused) {
+          audio.play();  btn.querySelector('ion-icon').name = 'pause-circle-outline';
+        } else {
+          audio.pause(); btn.querySelector('ion-icon').name = 'play-circle-outline';
+        }
       });
     });
 
-    ct.querySelectorAll('.audio-player').forEach(player => {
-      const btn = player.querySelector('.play-btn');
-      const audio = player.querySelector('audio');
-      btn.addEventListener('click', () => {
-        if (audio.paused) {
-          audio.play();
-          btn.querySelector('ion-icon').name = 'pause-circle-outline';
-        } else {
-          audio.pause();
-          btn.querySelector('ion-icon').name = 'play-circle-outline';
-        }
-      });
-    });
-    
-        
-  
-    cc.textContent       = `${cart.length} ${cart.length === 1 ? 'item' : 'items'}`;
-    totalEl.textContent  = cart.reduce((sum, it) => sum + it.price, 0).toFixed(2);
-    dlBtn.disabled       = true;
-  
-    // 2) Remove handlers
-    ct.querySelectorAll('.remove-item-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = Number(btn.closest('.cart-item').dataset.id);
-        await deleteCartItem(id);
-        document.getElementById('cart-modal-btn').click(); // refresh
-      });
-    });
-  
-    // 3) Initialize play/pause on each audio-player
-    ct.querySelectorAll('.audio-player').forEach(player => {
-      const btn = player.querySelector('.play-btn');
-      const audio = player.querySelector('audio');
-    
-      btn.addEventListener('click', () => {
-        // toggle play/pause
-        if (audio.paused) {
-          audio.play();
-          btn.classList.add('playing');
-          btn.querySelector('ion-icon')?.setAttribute('name', 'pause-circle-outline');
-        } else {
-          audio.pause();
-          btn.classList.remove('playing');
-          btn.querySelector('ion-icon')?.setAttribute('name', 'play-circle-outline');
-        }
-      });
-      
-      audio.addEventListener('ended', () => {
-        btn.classList.remove('playing');
-        btn.querySelector('ion-icon')?.setAttribute('name', 'play-circle-outline');
-      });
-    });
-    
+    cc.textContent      = `${cart.length} ${cart.length===1?'item':'items'}`;
+    totalEl.textContent = cart.reduce((s,i)=>s+i.price,0).toFixed(2);
+    dlBtn.disabled      = true;
   }
-  
-  document.getElementById('cart-modal').classList.remove('hidden');
-};
 
-// Close cart modal
+  document.getElementById('cart-modal').classList.remove('hidden');
+}
+
+document.getElementById('cart-modal-btn').onclick = renderCart;
 document.getElementById('close-cart-modal').onclick = () =>
   document.getElementById('cart-modal').classList.add('hidden');
 
-// ─── PAYSTACK CHECKOUT & DOWNLOAD ───────────────────────────────────────────────
-document.getElementById('checkout-btn').addEventListener('click', async () => {
+/**
+ * PAYSTACK & DOWNLOAD
+ */
+document.getElementById('checkout-btn').onclick = async () => {
   const cart   = await getCart();
-  const amount = cart.reduce((s, i) => s + i.price, 0) * 100; // kobo
+  const amount = cart.reduce((s,i)=>s+i.price,0)*100;
   const handler = PaystackPop.setup({
     key:      'YOUR_PUBLIC_KEY',
     email:    'customer@example.com',
@@ -315,23 +242,23 @@ document.getElementById('checkout-btn').addEventListener('click', async () => {
     onClose() { alert('Payment window closed'); },
     callback(r) {
       document.getElementById('download-btn').disabled = false;
-      alert('Payment successful! Ref: ' + r.reference);
+      alert('Payment successful! Ref: '+r.reference);
     }
   });
   handler.openIframe();
-});
+};
 
-document.getElementById('download-btn').addEventListener('click', async () => {
-  const btn  = document.getElementById('download-btn');
-  if (btn.disabled) return;
-  const cart = await getCart();
-  cart.forEach(it => {
+document.getElementById('download-btn').onclick = async () => {
+  if (document.getElementById('download-btn').disabled) return;
+  (await getCart()).forEach(it => {
     const a = document.createElement('a');
     a.href     = it.zip;
     a.download = `${it.title}.zip`;
     a.click();
   });
-});
+};
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+/**
+ * INIT
+ */
 window.addEventListener('DOMContentLoaded', renderProducts);

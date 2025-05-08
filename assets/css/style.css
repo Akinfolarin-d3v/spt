@@ -773,14 +773,14 @@ body.active { overflow: hidden; }
  * #TV SEREIS
 \*-----------------------------------*/
 
-.tv-series {
+.best-beat {
   background: url("../images/tv-series-bg.jpg") no-repeat;
   background-size: cover;
   background-position: center;
   padding-block: var(--section-padding);
 }
 
-.tv-series .section-title { margin-bottom: 50px; }
+.best-beat .section-title { margin-bottom: 50px; }
 
 
 
@@ -852,7 +852,7 @@ body.active { overflow: hidden; }
 \*-----------------------------------*/
 
 .footer-top {
-  background: url("..images/rythmrack-logo-zip-file/png/logo-no-background.png") no-repeat;
+  /* background: url("../images/rythmrack-logo-zip-file/png/logo.png") no-repeat; */
   background-size: cover;
   background-position: center;
   padding-block: 80px 50px;

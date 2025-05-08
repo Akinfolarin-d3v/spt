@@ -5,7 +5,7 @@ const bc = new BroadcastChannel('beatstore_channel');
 // ─── IndexedDB Helpers ────────────────────────────────────────────────────────
 function openDB() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('BeatStoreDB', 2);
+    const rq = indexedDB.open('BeatStoreDB', 1);
     rq.onupgradeneeded = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('products')) {
@@ -182,10 +182,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const demos = await Promise.all(groups.map(async grp => {
         const df = grp.querySelector('input[name="demoFiles[]"]').files[0];
-        return {
-          name: df.name.replace(/\.[^/.]+$/, ''),
-          url:  await readFile(df)
-        };
+        if (!df) throw new Error('Each demo group must have a file.');
+        return { name: df.name.replace(/\.[^/.]+$/, ''), url: await readFile(df) };
       }));
 
       const id = await idbAdd('products', { section, title, badge, price, image, demos, zip });

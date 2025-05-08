@@ -1,9 +1,11 @@
 'use strict';
 
+// 
+
 // ─── INDEXEDDB HELPERS ─────────────────────────────────────────────────────────
 function openDB() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('BeatStoreDB', 2);
+    const rq = indexedDB.open('BeatStoreDB', 3);
     rq.onupgradeneeded = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('products'))
@@ -77,7 +79,7 @@ function openProductModal(p) {
   });
 
   document.getElementById('modal-add-to-cart').onclick = async () => {
-    await saveCartItem({
+    await idbAdd('cart',{
       title: p.title,
       price: p.price,
       demos: p.demos.map(d => d.url),
@@ -91,13 +93,19 @@ function openProductModal(p) {
 }
 
 // Close product modal
-document.getElementById('close-product-modal').onclick = () => {
-  document.getElementById('product-modal').classList.add('hidden');
-};
+
+const closeBtn = document.getElementById('close-product-modal');
+if (closeBtn) {
+  closeBtn.onclick = () => {
+    document.getElementById('close-product-modal').onclick = () => {
+      document.getElementById('product-modal').classList.add('hidden');
+    };
+  };
+}
 
 // ─── CART MODAL LOGIC ───────────────────────────────────────────────────────────
 document.getElementById('cart-modal-btn').onclick = async () => {
-  const cart    = await getCart();
+  const cart = await idbGetAll('cart');
   const ct      = document.getElementById('cart-items');
   const cc      = document.getElementById('cart-count');
   const totalEl = document.getElementById('cart-total');
@@ -136,8 +144,7 @@ document.getElementById('cart-modal-btn').onclick = async () => {
     ct.querySelectorAll('.remove-item-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = Number(btn.closest('.cart-item').dataset.id);
-        await deleteCartItem(id);
-        // re‑open/refresh the cart
+        await idbDelete('cart', id);
         document.getElementById('cart-modal-btn').click();
       });
     });
@@ -235,16 +242,19 @@ async function renderAllPacks() {
     card.addEventListener('click', () => {
       const id = Number(card.dataset.id);
       const prod = prods.find(x => x.id === id);
+      
       openProductModal(prod);
     });
   });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Detect which page we're on
-  if (document.getElementById('all-packs-list')) {
+  const allPacksList = document.getElementById('all-packs-list');
+
+  if (allPacksList) {
+  
     renderAllPacks();
-  } else {
-    renderProducts();
   }
+
 });
+
