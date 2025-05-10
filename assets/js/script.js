@@ -1,4 +1,3 @@
-// assets/js/script.js
 import {
   fetchProducts,
   addToCart,

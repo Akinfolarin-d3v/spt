@@ -955,7 +955,7 @@ body.active { overflow: hidden; }
 
 .footer-bottom-img {
   max-width: max-content;
-  width: 100%;
+  width: 40%;
   margin-inline: auto;
 }
 
@@ -2026,7 +2026,7 @@ body.active { overflow: hidden; }
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  
+
 #auth-modal .modal-content {
   background: #111;
   border-radius: 12px;
@@ -2085,4 +2085,5 @@ body.active { overflow: hidden; }
 }
 .auth-form button {
   margin-top: 1rem;
+}
 }

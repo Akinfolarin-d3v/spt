@@ -1,112 +1,113 @@
+// assets/js/auth.js
+
 const SUPABASE_URL = 'https://qmuildxqrhizxcwoospq.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtdWlsZHhxcmhpenhjd29vc3BxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4NDUxMTMsImV4cCI6MjA2MjQyMTExM30.LFqZY0fS8NMgzU5_G5tOxQS4pu3Ka72ZNXeJvBuC2RE';
-const supabase     = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const authBtn      = document.getElementById('auth-btn');
-const authModal    = document.getElementById('auth-modal');
-const profileModal = document.getElementById('profile-modal');
+// — DOM references —
+const authBtn         = document.getElementById('auth-btn');
+const authModal       = document.getElementById('auth-modal');
+const profileModal    = document.getElementById('profile-modal');
+const closeAuthBtn    = document.getElementById('close-auth-modal');
+const closeProfileBtn = document.getElementById('close-profile-modal');
+const loginForm       = document.getElementById('login-form');
+const signupForm      = document.getElementById('signup-form');
+const tabs            = document.querySelectorAll('.tab-btn');
+const userNameEl      = document.getElementById('user-name');
+const userEmailEl     = document.getElementById('user-email');
+const purchasesEl     = document.getElementById('purchases-list');
+const signoutBtn      = document.getElementById('signout-btn');
 
-// Form elements
-const loginForm  = document.getElementById('login-form');
-const signupForm = document.getElementById('signup-form');
-const tabs       = document.querySelectorAll('.tab-btn');
-
-// Profile fields
-const userNameEl  = document.getElementById('user-name');
-const userEmailEl = document.getElementById('user-email');
-const purchasesEl = document.getElementById('purchases-list');
-
-// --- Helpers ---
-function showModal(modal) {
-  modal.classList.remove('hidden');
-}
-function hideModal(modal) {
-  modal.classList.add('hidden');
-}
+// — Helpers —
+function showModal(modal) { modal.classList.remove('hidden'); }
+function hideModal(modal) { modal.classList.add('hidden'); }
 function toggleForms(tab) {
   document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
   document.getElementById(`${tab}-form`).classList.remove('hidden');
   tabs.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
 }
 
-// --- Event Wiring ---
-
-// Header button click
+// — Header Sign‑In / Profile button —
 authBtn.addEventListener('click', async () => {
-  const user = supabase.auth.user();
+  const { data: { user } } = await supabase.auth.getUser();
   if (user) {
-    // Already logged in → show profile
     await loadUserProfile();
     showModal(profileModal);
   } else {
-    // Not logged in → show auth
     showModal(authModal);
   }
 });
 
-// Close buttons
-document.getElementById('close-auth-modal')
-  .addEventListener('click', () => hideModal(authModal));
-document.getElementById('close-profile-modal')
-  .addEventListener('click', () => hideModal(profileModal));
+// — Close buttons —
+closeAuthBtn.addEventListener('click', () => {
+  hideModal(authModal);
+});
+closeProfileBtn.addEventListener('click', () => {
+  hideModal(profileModal);
+});
 
-// Tab buttons
-tabs.forEach(b => b.addEventListener('click', () => toggleForms(b.dataset.tab)));
+// — Tab switching —
+tabs.forEach(btn =>
+  btn.addEventListener('click', () => toggleForms(btn.dataset.tab))
+);
 
-// --- Auth Flows ---
-
-// Sign Up
+// — Sign Up flow —
 signupForm.addEventListener('submit', async e => {
   e.preventDefault();
-  const name     = document.getElementById('signup-name').value;
-  const email    = document.getElementById('signup-email').value;
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;
-
-  const { user, error } = await supabase.auth.signUp({ email, password }, {
-    data: { full_name: name }
-  });
-  if (error) return alert(error.message);
-  alert('Registration successful! Please check your email to confirm.');
-  toggleForms('login');
+  const { error } = await supabase.auth.signUp(
+    { email, password },
+    { data: { full_name: name } }
+  );
+  if (error) {
+    alert(error.message);
+  } else {
+    alert('Registered! Check your email to confirm.');
+    toggleForms('login');
+  }
 });
 
-// Log In
+// — Log In flow —
 loginForm.addEventListener('submit', async e => {
   e.preventDefault();
-  const email    = document.getElementById('login-email').value;
+  const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
-
-  const { user, error } = await supabase.auth.signIn({ email, password });
-  if (error) return alert(error.message);
-
-  hideModal(authModal);
-  authBtn.textContent = 'View Profile';
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    alert(error.message);
+  } else {
+    hideModal(authModal);
+    authBtn.textContent = 'View Profile';
+  }
 });
 
-// Sign Out
-document.getElementById('signout-btn').addEventListener('click', async () => {
+// — Sign Out —
+signoutBtn.addEventListener('click', async () => {
   await supabase.auth.signOut();
   hideModal(profileModal);
   authBtn.textContent = 'Sign In';
 });
 
-// --- Profile Loading ---
-
+// — Load & render user profile —
 async function loadUserProfile() {
-  const user = supabase.auth.user();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
 
   userNameEl.textContent  = user.user_metadata.full_name || 'User';
   userEmailEl.textContent = user.email;
   authBtn.textContent      = 'View Profile';
 
-  // Fetch purchases from your `purchases` table
   const { data: purchases, error } = await supabase
     .from('purchases')
     .select('product_id')
     .eq('user_id', user.id);
 
-  if (error) return console.error(error);
+  if (error) {
+    console.error(error);
+    return;
+  }
 
   purchasesEl.innerHTML = purchases.map(p => `
     <li class="cart-item">
