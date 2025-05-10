@@ -1,7 +1,6 @@
-// assets/js/admin.js
 const supabase = window.supabase.createClient(
   'https://qmuildxqrhizxcwoospq.supabase.co',
-  'PUBLIC_ANON_KEY'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtdWlsZHhxcmhpenhjd29vc3BxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4NDUxMTMsImV4cCI6MjA2MjQyMTExM30.LFqZY0fS8NMgzU5_G5tOxQS4pu3Ka72ZNXeJvBuC2RE'
 );
 
 'use strict';
