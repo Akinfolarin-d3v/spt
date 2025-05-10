@@ -376,6 +376,24 @@ body.active { overflow: hidden; }
 
 .header-actions { display: none; }
 
+#auth-btn {
+  display: inline-flex !important;
+  margin-left: auto;         
+}
+
+.header .container > #auth-btn {
+  display: inline-flex !important;
+}
+
+@media (max-width: 480px) {
+  #auth-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+
+
 .menu-open-btn {
   color: var(--white);
   font-size: 40px;
@@ -1668,6 +1686,7 @@ body.active { overflow: hidden; }
   align-items: center;
   justify-content: center;
   z-index: 100;
+  
 }
 
 .modal.hidden {
@@ -1954,4 +1973,116 @@ body.active { overflow: hidden; }
 /* Optionally adjust the ion-icon inside play buttons */
 .audio-player .btn.btn-primary.play-btn ion-icon {
   font-size: 1.2rem;       /* slightly larger icon */
+}
+
+/* Payment Choice Modal */
+.payment-modal {
+  max-width: 360px;
+  width: 90%;
+  padding: 1.5rem;
+  background: #111;
+  text-align: center;
+}
+
+.payment-modal__title {
+  margin-bottom: 1rem;
+  color: var(--citrine);
+}
+
+.payment-modal__options {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.payment-btn {
+  flex: 1;
+  background: var(--rich-black-fogra-29);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.payment-btn:hover {
+  transform: scale(0.95);
+}
+
+.payment-btn__icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* AUTH MODAL BASE */
+#auth-modal.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+#auth-modal .modal-content {
+  background: #111;
+  border-radius: 12px;
+  max-width: 380px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  position: relative;
+}
+/* Close button */
+#auth-modal .modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  color: var(--citrine);
+  font-size: 1.5rem;
+}
+/* Tabs */
+#auth-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gainsboro);
+}
+#auth-tabs .tab-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--light-gray);
+  font-weight: var(--fw-700);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+#auth-tabs .tab-btn.active {
+  color: var(--white);
+  border-bottom: 3px solid var(--citrine);
+}
+/* Forms */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+.auth-form .form-group {
+  margin-bottom: 1rem;
+}
+.auth-form label {
+  color: var(--light-gray);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+.auth-form input {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--gunmetal-1);
+  border-radius: 6px;
+  background: var(--raisin-black);
+  color: var(--white);
+}
+.auth-form button {
+  margin-top: 1rem;
 }
