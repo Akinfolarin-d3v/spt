@@ -1,11 +1,9 @@
-// assets/js/supabase-client.js
-import { createClient } from '@supabase/supabase-js';
+
 
 // ── Initialize Supabase ────────────────────────────────────
-// Replace the URL and anon key with your project's—only these two lines:
 export const supabase = createClient(
-  'https://xyzabc123.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'  
+  'https://qmuildxqrhizxcwoospq.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtdWlsZHhxcmhpenhjd29vc3BxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4NDUxMTMsImV4cCI6MjA2MjQyMTExM30.LFqZY0fS8NMgzU5_G5tOxQS4pu3Ka72ZNXeJvBuC2RE'  
 );
 
 // ── Authentication ──────────────────────────────────────────

@@ -1,7 +1,5 @@
-// assets/js/ui-core.js
 'use strict';
 
-// ── NAVBAR / STICKY HEADER / GO‑TOP ─────────────────────────
 const navOpenBtn  = document.querySelector('[data-menu-open-btn]');
 const navCloseBtn = document.querySelector('[data-menu-close-btn]');
 const navbar      = document.querySelector('[data-navbar]');
@@ -23,22 +21,17 @@ window.addEventListener('scroll', () => {
   goTopBtn?.classList.toggle('active', window.scrollY >= 500);
 });
 
-// ── PRODUCT MODAL CLOSE ─────────────────────────────────────
 document.getElementById('close-product-modal')?.addEventListener('click', () => {
   document.getElementById('product-modal').classList.add('hidden');
 });
 
-// ── CART MODAL CLOSE ────────────────────────────────────────
 document.getElementById('close-cart-modal')?.addEventListener('click', () => {
   document.getElementById('cart-modal').classList.add('hidden');
 });
 
-// ── ADMIN NAV LOGIN/LOGOUT BUTTONS (if not using Supabase there) ─
 document.getElementById('logout-btn')?.addEventListener('click', () => {
-  // If you’re still using the simple admin login logic:
-  // showLoginUI();
+ 
   
-  // If using Supabase auth for admin:
   supabase.auth.signOut().then(() => location.reload());
 });
 

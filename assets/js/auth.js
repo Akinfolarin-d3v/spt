@@ -29,12 +29,14 @@ function toggleForms(tab) {
 }
 
 // Header Sign‑In / Profile Logic
+console.log('Binding authBtn:', !!document.getElementById('auth-btn'));
 authBtn.addEventListener('click', async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user && user.user_metadata.is_admin) {
-    window.location.href = 'admin.html';
-    return;
-  }
+const { data: { user }, error } = await supabase.auth.getUser();
+if (user && user.user_metadata.is_admin) {
+  window.location.href = 'admin.html';
+  return;
+}
+
   if (user) {
     await loadUserProfile();
     showModal(profileModal);
@@ -44,7 +46,12 @@ authBtn.addEventListener('click', async () => {
 });
 
 // Close modals
-closeAuthBtn.addEventListener('click', () => hideModal(authModal));
+console.log('Binding closeAuthBtn:', !!document.getElementById('close-auth-modal'));
+
+closeAuthBtn.addEventListener('click', async () => {
+   await supabase.auth.signOut();
+   hideModal(authModal);
+ });
 closeProfileBtn.addEventListener('click', () => hideModal(profileModal));
 
 // Tab switching

@@ -1,3 +1,8 @@
+const supabase = window.supabase.createClient(
+  'https://qmuildxqrhizxcwoospq.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtdWlsZHhxcmhpenhjd29vc3BxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4NDUxMTMsImV4cCI6MjA2MjQyMTExM30.LFqZY0fS8NMgzU5_G5tOxQS4pu3Ka72ZNXeJvBuC2RE'
+);
+
 import {
   fetchProducts,
   addToCart,
@@ -170,12 +175,14 @@ export async function renderCart() {
 document.getElementById('checkout-btn').onclick = () => {
   document.getElementById('payment-modal').classList.remove('hidden');
 };
-document.querySelectorAll('#payment-modal .payment-btn')
-  .forEach(btn => btn.addEventListener('click', async () => {
+document.querySelectorAll('.payment-btn').forEach(btn => {
+  
+  btn.addEventListener('click', async () => {
     document.getElementById('payment-modal').classList.add('hidden');
-    await checkoutAndLog();
+    await checkoutAndLog();            
     document.getElementById('download-btn').disabled = false;
-  }));
+  });
+});
 document.getElementById('download-btn').onclick = async () => {
   const { data: cartRows } = await fetchCart();
   const { data: products } = await fetchProducts();
