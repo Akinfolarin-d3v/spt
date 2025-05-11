@@ -18,6 +18,43 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body id="top">
+  <script>
+// Create an on-screen “error panel”
+(function() {
+  const panel = document.createElement('div');
+  panel.id = 'global-error-panel';
+  panel.style = [
+    'position:fixed',
+    'bottom:0', 'left:0', 'right:0',
+    'max-height:40vh', 'overflow:auto',
+    'background:rgba(0,0,0,0.9)',
+    'color:#f88', 'font-family:monospace',
+    'font-size:12px', 'padding:10px',
+    'z-index:9999', 'display:none'
+  ].join(';');
+  document.body.appendChild(panel);
+
+  function showError(msg) {
+    panel.style.display = 'block';
+    const line = document.createElement('div');
+    line.textContent = msg;
+    panel.appendChild(line);
+    console.error(msg);
+  }
+
+  // Catch synchronous JS errors
+  window.onerror = function(message, source, lineno, colno, error) {
+    showError(`Error: ${message} at ${source}:${lineno}:${colno}`);
+    return false; // let default handler run as well
+  };
+
+  // Catch unhandled promise rejections
+  window.addEventListener('unhandledrejection', function(e) {
+    showError(`Unhandled Promise Rejection: ${e.reason}`);
+  });
+})();
+</script>
+
 
   <!-- IndexedDB Helpers -->
   <script src="./assets/js/idb-helpers.js" defer></script>
